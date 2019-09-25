@@ -124,6 +124,7 @@ impl ToT9B2 for T3B1 {
         }
 
         let mut bytes = vec![0u8; (self.len() / 3) * 2];
+        let mut j = 0;
 
         for i in (0..self.0.len()).step_by(3) {
             let a = self.0[i + 0].value();
@@ -134,8 +135,10 @@ impl ToT9B2 for T3B1 {
             let b = if b < 0 { b + 27 } else { b };
             let c = if c < 0 { c + 27 } else { c };
 
-            bytes[2 * i + 0] = (a * 8 + c % 8) as u8;
-            bytes[2 * i + 1] = (b * 8 + c / 8) as u8;
+            bytes[j + 0] = (a * 8 + c % 8) as u8;
+            bytes[j + 1] = (b * 8 + c / 8) as u8;
+
+            j += 2;
         }
 
         Ok(T9B2::from_bytes(&bytes))

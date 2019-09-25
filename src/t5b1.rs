@@ -28,6 +28,7 @@ impl ToT1B1 for T5B1 {
 
         for i in 0..self.len() {
             trits[j..(j + 5)].copy_from_slice(&luts::trits_from_byte_internal(self.0[i]));
+
             j += 5;
         }
 
