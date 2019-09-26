@@ -4,56 +4,60 @@ use crate::t3b1::T3B1;
 
 use std::convert::TryInto;
 
-pub trait RawTrits {
+pub trait Encoding {
     fn new() -> Self;
     fn with_capacity(capacity: usize) -> Self;
     fn len(&self) -> usize;
     fn add_trits(&mut self, trits: T1B1) -> error::Result<()>;
 }
 
-pub struct Trits<T: RawTrits = T1B1> {
-    raw: T,
+pub struct Trits<T: Encoding = T1B1> {
+    enc: T,
 }
 
 impl Trits {
     pub fn default() -> Self {
-        Self { raw: T1B1::new() }
+        Self { enc: T1B1::new() }
     }
 }
 
-impl<T: RawTrits> Trits<T> {
+impl<T: Encoding> Trits<T> {
     pub fn new() -> Self {
-        Self { raw: T::new() }
+        Self { enc: T::new() }
     }
 
     /// NOTE: make sure to add as many trits as required by the encoding
-    pub fn add_trits<S>(&mut self, trits: S)
+    pub fn add_trits<S>(&mut self, trits: S) -> error::Result<()>
     where
         S: TryInto<T1B1>,
         S::Error: std::fmt::Debug,
     {
-        let trits = trits.try_into().expect("error parsing trits");
+        if let Ok(trits) = trits.try_into() {
+            self.enc.add_trits(trits)?;
+        } else {
+            return Err(error::TrinaryError::InvalidTritChar);
+        };
 
-        self.raw
-            .add_trits(trits)
-            .expect("error adding trits to encoder");
+        Ok(())
     }
 
     /// NOTE: make sure to add as many trytes as required by the encoding
-    pub fn add_trytes<S>(&mut self, trytes: S)
+    pub fn add_trytes<S>(&mut self, trytes: S) -> error::Result<()>
     where
         S: TryInto<T3B1>,
         S::Error: std::fmt::Debug,
     {
-        let trytes = trytes.try_into().expect("error parsing trytes");
-        let trits = trytes.to_t1b1();
+        if let Ok(trytes) = trytes.try_into() {
+            let trits = trytes.to_t1b1();
+            self.enc.add_trits(trits)?;
+        } else {
+            return Err(error::TrinaryError::InvalidTryteChar);
+        }
 
-        self.raw
-            .add_trits(trits)
-            .expect("error adding trytes to encoder");
+        Ok(())
     }
 
     pub fn len(&self) -> usize {
-        self.raw.len()
+        self.enc.len()
     }
 }

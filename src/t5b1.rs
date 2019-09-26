@@ -1,7 +1,7 @@
 use crate::error;
 use crate::luts;
 use crate::t1b1::{ToT1B1, T1B1};
-use crate::trits::RawTrits;
+use crate::trits::Encoding;
 
 #[derive(Debug)]
 pub struct T5B1(Vec<u8>);
@@ -36,7 +36,7 @@ impl ToT1B1 for T5B1 {
     }
 }
 
-impl RawTrits for T5B1 {
+impl Encoding for T5B1 {
     fn new() -> Self {
         Self(Vec::new())
     }

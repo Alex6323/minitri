@@ -4,7 +4,7 @@ use crate::t1b1::{ToT1B1, T1B1};
 use crate::t5b1::{ToT5B1, T5B1};
 use crate::t9b2::{ToT9B2, T9B2};
 use crate::trit::Trit;
-use crate::trits::RawTrits;
+use crate::trits::Encoding;
 use crate::tryte::Tryte;
 
 use std::convert::TryInto;
@@ -145,7 +145,7 @@ impl ToT9B2 for T3B1 {
     }
 }
 
-impl RawTrits for T3B1 {
+impl Encoding for T3B1 {
     fn new() -> Self {
         Self(Vec::new())
     }

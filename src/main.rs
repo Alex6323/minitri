@@ -44,22 +44,22 @@ fn main() {
     // ======================================================================
 
     let mut trits: Trits<T1B1> = Trits::new();
-    trits.add_trits("10-");
-    trits.add_trytes("ABC");
+    trits.add_trits("10-").unwrap();
+    trits.add_trytes("ABC").unwrap();
     println!("13: {}", trits.len());
 
     let mut trits: Trits<T3B1> = Trits::new();
-    trits.add_trits("10-");
-    trits.add_trytes("ABC");
+    trits.add_trits("10-").unwrap();
+    trits.add_trytes("ABC").unwrap();
     println!("14: {}", trits.len());
 
     let mut trits: Trits<T5B1> = Trits::new();
-    trits.add_trits("10-1-10-1-");
-    trits.add_trytes("ABCDE");
+    trits.add_trits("10-1-10-1-").unwrap();
+    trits.add_trytes("ABCDE").unwrap();
     println!("15: {}", trits.len());
 
     let mut trits: Trits<T9B2> = Trits::new();
-    trits.add_trits("10--110-0");
-    trits.add_trytes("ABC");
+    trits.add_trits("10--110-0").unwrap();
+    trits.add_trytes("ABC").unwrap();
     println!("16: {}", trits.len());
 }
