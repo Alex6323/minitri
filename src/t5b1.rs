@@ -1,6 +1,6 @@
 use crate::error;
 use crate::luts;
-use crate::t1b1::{ToT1B1, T1B1};
+use crate::t1b1::T1B1;
 use crate::trits::Encoding;
 
 #[derive(Debug)]
@@ -20,14 +20,14 @@ impl T5B1 {
     }
 }
 
-impl ToT1B1 for T5B1 {
-    fn to_t1b1(&self) -> T1B1 {
-        let mut trits = vec![0i8; self.len() * 5];
+impl From<T5B1> for T1B1 {
+    fn from(bytes: T5B1) -> T1B1 {
+        let mut trits = vec![0i8; bytes.len() * 5];
 
         let mut j = 0;
 
-        for i in 0..self.len() {
-            trits[j..(j + 5)].copy_from_slice(&luts::trits_from_byte_internal(self.0[i]));
+        for i in 0..bytes.len() {
+            trits[j..(j + 5)].copy_from_slice(&luts::trits_from_byte_internal(bytes.0[i]));
 
             j += 5;
         }
@@ -45,14 +45,12 @@ impl Encoding for T5B1 {
         Self(Vec::with_capacity(capacity))
     }
 
-    fn add_trits(&mut self, trits: T1B1) -> error::Result<()> {
-        let bytes = trits.to_t5b1()?;
+    fn add(&mut self, trits: T1B1) {
+        let bytes: T5B1 = trits.into();
 
         for byte in bytes.0 {
             self.0.push(byte);
         }
-
-        Ok(())
     }
 
     fn len(&self) -> usize {

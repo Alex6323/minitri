@@ -15,28 +15,28 @@ fn main() {
     let trytes: T3B1 = "ABC".try_into().expect("error creating tryte sequence");
     println!("04: {}", trytes);
 
-    let trits = trytes.to_t1b1();
+    let trits: T1B1 = trytes.into();
     println!("05: {}", trits);
 
-    let trytes = trits.to_t3b1().expect("error creating T3B1 encoded trits");
+    let trytes: T3B1 = trits.into();
     println!("06: {}", trytes);
 
-    let bytes9t2b = trytes.to_t9b2().expect("error creating T9B2 encoded trits");
+    let bytes9t2b: T9B2 = trytes.into();
     println!("07: {:?}", bytes9t2b);
 
-    let trits = bytes9t2b.to_t1b1();
+    let trits: T1B1 = bytes9t2b.into();
     println!("08: {}", trits);
 
     let trytes: T3B1 = "ABCDE".try_into().expect("error creating tryte sequence");
     println!("09: {}", trytes);
 
-    let bytes5t1b = trytes.to_t5b1().expect("error creating T5B1 encoded trits");
+    let bytes5t1b: T5B1 = trytes.into();
     println!("10: {:?}", bytes5t1b);
 
-    let trits = bytes5t1b.to_t1b1();
+    let trits: T1B1 = bytes5t1b.into();
     println!("11: {}", trits);
 
-    let trytes: T3B1 = trits.to_t3b1().expect("error creating T3B1 encoded trits");
+    let trytes: T3B1 = trits.into();
     println!("12: {}", trytes);
 
     // ======================================================================

@@ -1,20 +1,16 @@
 use crate::error::{self, TrinaryError};
 use crate::luts;
-use crate::t1b1::{ToT1B1, T1B1};
-use crate::t5b1::{ToT5B1, T5B1};
-use crate::t9b2::{ToT9B2, T9B2};
+use crate::t1b1::T1B1;
+use crate::t5b1::T5B1;
+use crate::t9b2::T9B2;
 use crate::trit::Trit;
 use crate::trits::Encoding;
 use crate::tryte::Tryte;
 
-use std::convert::TryInto;
+use std::convert::{TryFrom, TryInto};
 
 #[derive(Debug)]
 pub struct T3B1(Vec<Tryte>);
-
-pub trait ToT3B1 {
-    fn to_t3b1(&self) -> error::Result<T3B1>;
-}
 
 impl T3B1 {
     pub fn len(&self) -> usize {
@@ -39,11 +35,11 @@ impl T3B1 {
     }
 }
 
-impl ToT1B1 for T3B1 {
-    fn to_t1b1(&self) -> T1B1 {
-        let mut trits = T1B1::with_capacity(3 * self.len());
+impl From<T3B1> for T1B1 {
+    fn from(trytes: T3B1) -> T1B1 {
+        let mut trits = T1B1::with_capacity(3 * trytes.len());
 
-        for tryte in &self.0 {
+        for tryte in &trytes.0 {
             let trits_in_tryte = luts::trits_from_tryteindex_internal(tryte.index());
             for trit in &trits_in_tryte {
                 trits.push_internal(Trit(*trit));
@@ -54,13 +50,13 @@ impl ToT1B1 for T3B1 {
     }
 }
 
-impl<'a> TryInto<T3B1> for &'a str {
+impl<'a> TryFrom<&'a str> for T3B1 {
     type Error = TrinaryError;
 
-    fn try_into(self) -> std::result::Result<T3B1, Self::Error> {
+    fn try_from(s: &'a str) -> Result<Self, Self::Error> {
         let mut trytes = vec![];
 
-        for c in self.chars() {
+        for c in s.chars() {
             trytes.push(c.try_into()?);
         }
 
@@ -77,23 +73,22 @@ impl std::fmt::Display for T3B1 {
     }
 }
 
-impl ToT5B1 for T3B1 {
-    fn to_t5b1(&self) -> error::Result<T5B1> {
-        if (self.len() * 3) % 5 != 0 {
-            // TODO: fill remainder with zeros
-            return Err(TrinaryError::IncompatibleLength);
+impl From<T3B1> for T5B1 {
+    fn from(trytes: T3B1) -> T5B1 {
+        if (trytes.len() * 3) % 5 != 0 {
+            panic!("Stay calm, this panic is only of temporary nature! <boarding escape pod>");
         }
 
-        let mut bytes = vec![0u8; (self.len() * 3) / 5];
+        let mut bytes = vec![0u8; (trytes.len() * 3) / 5];
         let mut j = 0;
 
-        for i in (0..self.0.len()).step_by(5) {
+        for i in (0..trytes.0.len()).step_by(5) {
             // NOTE: currently we assume that at least one full iteration is possible
-            let trits1 = self.0[i + 0].trits();
-            let trits2 = self.0[i + 1].trits();
-            let trits3 = self.0[i + 2].trits();
-            let trits4 = self.0[i + 3].trits();
-            let trits5 = self.0[i + 4].trits();
+            let trits1 = trytes.0[i + 0].trits();
+            let trits2 = trytes.0[i + 1].trits();
+            let trits3 = trytes.0[i + 2].trits();
+            let trits4 = trytes.0[i + 3].trits();
+            let trits5 = trytes.0[i + 4].trits();
 
             let a = (trits1[0] + trits1[1] * 3 + trits1[2] * 9 + trits2[0] * 27 + trits2[1] * 81)
                 as i16;
@@ -113,23 +108,23 @@ impl ToT5B1 for T3B1 {
             j += 3;
         }
 
-        Ok(T5B1::from_bytes(&bytes))
+        T5B1::from_bytes(&bytes)
     }
 }
 
-impl ToT9B2 for T3B1 {
-    fn to_t9b2(&self) -> error::Result<T9B2> {
-        if self.len() % 3 != 0 {
-            return Err(TrinaryError::IncompatibleLength);
+impl From<T3B1> for T9B2 {
+    fn from(trytes: T3B1) -> T9B2 {
+        if trytes.len() % 3 != 0 {
+            panic!("Stay calm, this panic is only of temporary nature! <boarding escape pod>");
         }
 
-        let mut bytes = vec![0u8; (self.len() / 3) * 2];
+        let mut bytes = vec![0u8; (trytes.len() / 3) * 2];
         let mut j = 0;
 
-        for i in (0..self.0.len()).step_by(3) {
-            let a = self.0[i + 0].value();
-            let b = self.0[i + 1].value();
-            let c = self.0[i + 2].value();
+        for i in (0..trytes.0.len()).step_by(3) {
+            let a = trytes.0[i + 0].value();
+            let b = trytes.0[i + 1].value();
+            let c = trytes.0[i + 2].value();
 
             let a = if a < 0 { a + 27 } else { a };
             let b = if b < 0 { b + 27 } else { b };
@@ -141,7 +136,7 @@ impl ToT9B2 for T3B1 {
             j += 2;
         }
 
-        Ok(T9B2::from_bytes(&bytes))
+        T9B2::from_bytes(&bytes)
     }
 }
 
@@ -154,14 +149,12 @@ impl Encoding for T3B1 {
         Self(Vec::with_capacity(capacity))
     }
 
-    fn add_trits(&mut self, trits: T1B1) -> error::Result<()> {
-        let trytes = trits.to_t3b1()?;
+    fn add(&mut self, trits: T1B1) {
+        let trytes: T3B1 = trits.into();
 
         for tryte in trytes.0 {
             self.push_internal(tryte);
         }
-
-        Ok(())
     }
 
     fn len(&self) -> usize {

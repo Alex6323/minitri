@@ -1,14 +1,10 @@
 use crate::error;
 use crate::luts;
-use crate::t1b1::{ToT1B1, T1B1};
+use crate::t1b1::T1B1;
 use crate::trits::Encoding;
 
 #[derive(Debug)]
 pub struct T9B2(Vec<u8>);
-
-pub trait ToT9B2 {
-    fn to_t9b2(&self) -> error::Result<T9B2>;
-}
 
 impl T9B2 {
     pub fn len(&self) -> usize {
@@ -20,15 +16,15 @@ impl T9B2 {
     }
 }
 
-impl ToT1B1 for T9B2 {
-    fn to_t1b1(&self) -> T1B1 {
-        let mut trits = vec![0i8; (self.len() / 2) * 9];
+impl From<T9B2> for T1B1 {
+    fn from(bytes: T9B2) -> T1B1 {
+        let mut trits = vec![0i8; (bytes.len() / 2) * 9];
 
         let mut j = 0;
 
-        for i in (0..self.len()).step_by(2) {
-            let a = self.0[i + 0] as usize;
-            let b = self.0[i + 1] as usize;
+        for i in (0..bytes.len()).step_by(2) {
+            let a = bytes.0[i + 0] as usize;
+            let b = bytes.0[i + 1] as usize;
 
             trits[(j + 0)..(j + 3)].copy_from_slice(&luts::trits_from_tryteindex_internal(a / 8));
             trits[(j + 3)..(j + 6)].copy_from_slice(&luts::trits_from_tryteindex_internal(b / 8));
@@ -51,14 +47,12 @@ impl Encoding for T9B2 {
         Self(Vec::with_capacity(capacity))
     }
 
-    fn add_trits(&mut self, trits: T1B1) -> error::Result<()> {
-        let bytes = trits.to_t9b2()?;
+    fn add(&mut self, trits: T1B1) {
+        let bytes: T9B2 = trits.into();
 
         for byte in bytes.0 {
             self.0.push(byte);
         }
-
-        Ok(())
     }
 
     fn len(&self) -> usize {

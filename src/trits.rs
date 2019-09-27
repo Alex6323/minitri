@@ -1,5 +1,5 @@
 use crate::error;
-use crate::t1b1::{ToT1B1, T1B1};
+use crate::t1b1::T1B1;
 use crate::t3b1::T3B1;
 
 use std::convert::TryInto;
@@ -8,7 +8,7 @@ pub trait Encoding {
     fn new() -> Self;
     fn with_capacity(capacity: usize) -> Self;
     fn len(&self) -> usize;
-    fn add_trits(&mut self, trits: T1B1) -> error::Result<()>;
+    fn add(&mut self, trits: T1B1); // use bytes
 }
 
 pub struct Trits<T: Encoding = T1B1> {
@@ -33,7 +33,7 @@ impl<T: Encoding> Trits<T> {
         S::Error: std::fmt::Debug,
     {
         if let Ok(trits) = trits.try_into() {
-            self.enc.add_trits(trits)?;
+            self.enc.add(trits);
         } else {
             return Err(error::TrinaryError::InvalidTritChar);
         };
@@ -48,8 +48,8 @@ impl<T: Encoding> Trits<T> {
         S::Error: std::fmt::Debug,
     {
         if let Ok(trytes) = trytes.try_into() {
-            let trits = trytes.to_t1b1();
-            self.enc.add_trits(trits)?;
+            let trits: T1B1 = trytes.into();
+            self.enc.add(trits);
         } else {
             return Err(error::TrinaryError::InvalidTryteChar);
         }
