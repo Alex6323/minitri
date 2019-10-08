@@ -26,6 +26,12 @@ impl<T: Encoding> Trits<T> {
         Self { enc: T::new() }
     }
 
+    pub fn with_capacity(capacity: usize) -> Self {
+        Self {
+            enc: T::with_capacity(capacity),
+        }
+    }
+
     /// NOTE: make sure to add as many trits as required by the encoding
     pub fn add_trits<S>(&mut self, trits: S) -> error::Result<()>
     where
