@@ -9,11 +9,15 @@ mod trit;
 mod trits;
 mod tryte;
 
-pub use error::TrinaryError;
-pub use t1b1::T1B1;
-pub use t3b1::T3B1;
-pub use t5b1::T5B1;
-pub use t9b2::T9B2;
-pub use trit::Trit;
-pub use trits::Trits;
-pub use tryte::Tryte;
+pub use crate::error::TrinaryError;
+pub use crate::t1b1::T1B1;
+pub use crate::t3b1::T3B1;
+pub use crate::t5b1::T5B1;
+pub use crate::t9b2::T9B2;
+pub use crate::trit::Trit;
+pub use crate::trits::Trits;
+pub use crate::tryte::Tryte;
+
+pub mod prelude {
+    pub use super::*;
+}

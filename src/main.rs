@@ -1,4 +1,4 @@
-use trits_module_preview::*;
+use trits_module_preview::prelude::*;
 
 use std::convert::TryInto;
 
