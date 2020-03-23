@@ -22,14 +22,11 @@ impl T1B1 {
         Self(trits)
     }
 
-    pub fn push<T>(&mut self, trit: T) -> Result<(), TrinaryError>
+    pub fn push<T>(&mut self, trit: T)
     where
-        T: TryInto<Trit>,
-        TrinaryError: From<T::Error>,
+        T: Into<Trit>,
     {
-        self.0.push(trit.try_into()?);
-
-        Ok(())
+        self.0.push(trit.into());
     }
 
     pub fn pop(&mut self) {
@@ -68,7 +65,7 @@ impl<'a> TryFrom<&'a str> for T1B1 {
         let mut trits = vec![];
 
         for c in s.chars() {
-            trits.push(c.try_into()?);
+            trits.push(c.into());
         }
 
         Ok(T1B1(trits))
@@ -176,8 +173,8 @@ mod should {
         let mut trits = T1B1::new();
         assert_eq!(0, trits.len());
 
-        trits.push('1').expect("error pushing trit");
-        trits.push('-').expect("error pushing trit");
+        trits.push('1');
+        trits.push('-');
         assert_eq!(2, trits.len());
 
         trits.pop();
