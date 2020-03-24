@@ -1,86 +1,76 @@
-use crate::luts;
+use std::fmt;
 
-#[derive(Debug)]
-pub struct Trit(pub(crate) i8);
-
-impl Trit {
-    pub fn value(&self) -> i8 {
-        self.0
-    }
-    pub(crate) fn index(&self) -> usize {
-        match self.0 {
-            0 | 1 => self.0 as usize,
-            -1 => 2 as usize,
-            _ => unreachable!(),
-        }
-    }
+#[repr(i8)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum BalancedTrit {
+    MinusOne = -1,
+    Zero = 0,
+    PlusOne = 1,
 }
 
-impl From<char> for Trit {
+impl From<char> for BalancedTrit {
     fn from(c: char) -> Self {
         match c {
-            '1' => Trit(1),
-            '0' => Trit(0),
-            '-' => Trit(-1),
-            _ => panic!("Invalid trit char"),
+            '-' => BalancedTrit::MinusOne,
+            '0' => BalancedTrit::Zero,
+            '1' => BalancedTrit::PlusOne,
+            _ => panic!("Invalid trit character"),
         }
     }
 }
 
-impl Into<Trit> for i8 {
-    fn into(self) -> Trit {
-        match self {
-            1 => Trit(1),
-            0 => Trit(0),
-            -1 => Trit(-1),
-            _ => panic!("Invalid i8"),
+impl From<i8> for BalancedTrit {
+    fn from(i: i8) -> Self {
+        match i {
+            -1 => BalancedTrit::MinusOne,
+            0 => BalancedTrit::Zero,
+            1 => BalancedTrit::PlusOne,
+            _ => panic!("Invalid i8 integer"),
         }
     }
 }
 
-impl std::fmt::Display for Trit {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}", luts::TRIT_SYMBOLS[self.index()])
+impl fmt::Display for BalancedTrit {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match *self {
+                BalancedTrit::MinusOne => '-',
+                BalancedTrit::Zero => '0',
+                BalancedTrit::PlusOne => '1',
+            }
+        )
     }
 }
 
 #[cfg(test)]
-mod should {
+mod tests {
     use super::*;
 
     #[test]
-    fn be_creatable_from_valid_chars() {
-        let trit: Trit = '1'.into();
-        assert_eq!(1, trit.value());
-
-        let trit: Trit = '0'.into();
-        assert_eq!(0, trit.value());
-
-        let trit: Trit = '-'.into();
-        assert_eq!(-1, trit.value());
+    fn create_trits_from_chars() {
+        assert_eq!(BalancedTrit::PlusOne, '1'.into());
+        assert_eq!(BalancedTrit::Zero, '0'.into());
+        assert_eq!(BalancedTrit::MinusOne, '-'.into());
     }
 
     #[test]
-    fn be_creatable_from_valid_values() {
-        let trit: Trit = 1.into();
-        assert_eq!(1, trit.value());
-
-        let trit: Trit = 0.into();
-        assert_eq!(0, trit.value());
-
-        let trit: Trit = (-1).into();
-        assert_eq!(-1, trit.value());
+    fn create_trits_from_values() {
+        assert_eq!(BalancedTrit::PlusOne, 1.into());
+        assert_eq!(BalancedTrit::Zero, 0.into());
+        assert_eq!(BalancedTrit::MinusOne, (-1).into());
     }
 
     #[test]
     #[should_panic]
-    fn fail_initializing_for_invalid_char() {
-        let _: Trit = '2'.into();
+    fn fail_for_invalid_char() {
+        let _: BalancedTrit = '2'.into();
     }
 
     #[test]
     #[should_panic]
-    fn fail_initializing_for_invalid_value() {
-        let _: Trit = 2.into();
+    fn fail_for_invalid_value() {
+        let _: BalancedTrit = 2.into();
     }
 }

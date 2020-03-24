@@ -1,11 +1,7 @@
 [package]
-name = "trits-module-preview"
+name = "minitri"
 version = "0.1.0"
 authors = ["/alex/ <alexander.schmidt@iota.org>"]
 edition = "2018"
 
 [dependencies]
-
-[[bin]]
-path = "src/main.rs"
-name = "preview"

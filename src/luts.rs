@@ -1,19 +1,9 @@
 use crate::constants::*;
-use crate::error::TrinaryError;
 
-pub(crate) const TRIT_SYMBOLS: [char; BASE3] = ['0', '1', '-'];
+pub fn trits_from_tryteindex(index: usize) -> [i8; BASE3] {
+    assert!(index < BASE3_POW3, "invalid tryte index");
 
-pub(crate) const TRYTE_SYMBOLS: [char; BASE3_POW3] = [
-    '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-    'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-];
-
-pub fn trits_from_tryteindex(index: usize) -> Result<[i8; BASE3], TrinaryError> {
-    if index >= BASE3_POW3 {
-        return Err(TrinaryError::InvalidTryteIndex);
-    }
-
-    Ok(TRYTEINDEX_TO_TRITS[index])
+    TRYTEINDEX_TO_TRITS[index]
 }
 
 pub(crate) fn trits_from_tryteindex_internal(index: usize) -> [i8; BASE3] {
@@ -50,14 +40,11 @@ const TRYTEINDEX_TO_TRITS: [[i8; BASE3]; BASE3_POW3] = [
     [-1, 0, 0], // -1   'Z'
 ];
 
-pub fn trits_from_byte(byte: u8) -> Result<[i8; MAX_NUM_TRITS_PER_BYTE], TrinaryError> {
+pub fn trits_from_byte(byte: u8) -> [i8; MAX_NUM_TRITS_PER_BYTE] {
     let index = byte as usize;
+    assert!(index < BASE3_POW5, "Invalid T5B1 bytes");
 
-    if index >= BASE3_POW5 {
-        return Err(TrinaryError::InvalidT5B1Byte);
-    }
-
-    Ok(BYTE_TO_TRITS[index])
+    BYTE_TO_TRITS[index]
 }
 
 pub(crate) fn trits_from_byte_internal(byte: u8) -> [i8; MAX_NUM_TRITS_PER_BYTE] {
