@@ -1,24 +1,35 @@
 use super::t1b1::T1B1;
-use crate::luts;
-
 use super::Encoding;
-//use super::t5b1::T5B1;
-//use super::t9b2::T9B2;
 
-use crate::trit::Trit;
-use crate::tryte::Tryte;
+use crate::tryte::BalancedTryte;
+
+use std::fmt;
 
 #[derive(Debug)]
-pub struct T3B1(Vec<Tryte>);
+pub struct T3B1(Vec<BalancedTryte>);
 
 impl T3B1 {
-    pub fn len(&self) -> usize {
-        self.0.len()
+    pub fn from_i8(input: &[i8]) -> Self {
+        let mut trytes: Vec<BalancedTryte> = Vec::with_capacity(input.len());
+
+        for tryte in input {
+            trytes.push((*tryte).into());
+        }
+
+        Self(trytes)
+    }
+
+    pub fn get(&self, index: usize) -> &BalancedTryte {
+        &self.0[index]
+    }
+
+    pub fn get_mut(&mut self, index: usize) -> &mut BalancedTryte {
+        &mut self.0[index]
     }
 
     pub fn push<T>(&mut self, tryte: T)
     where
-        T: Into<Tryte>,
+        T: Into<BalancedTryte>,
     {
         self.0.push(tryte.into());
     }
@@ -27,7 +38,7 @@ impl T3B1 {
         self.0.pop();
     }
 
-    pub(crate) fn push_internal(&mut self, tryte: Tryte) {
+    pub(crate) fn push_internal(&mut self, tryte: BalancedTryte) {
         self.0.push(tryte);
     }
 }
@@ -66,8 +77,8 @@ impl<'a> From<&'a str> for T3B1 {
     }
 }
 
-impl std::fmt::Display for T3B1 {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl fmt::Display for T3B1 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for tryte in &self.0 {
             tryte.fmt(f)?;
         }
@@ -76,33 +87,61 @@ impl std::fmt::Display for T3B1 {
 }
 
 impl From<T1B1> for T3B1 {
-    fn from(trits: T1B1) -> T3B1 {
-        if trits.len() % 3 != 0 {
-            panic!("Stay calm, this panic is only of temporary nature! <boarding escape pod>");
+    fn from(input: T1B1) -> T3B1 {
+        let n = input.len();
+        if n % 3 != 0 {
+            panic!("Input must be a multiple of 3 for this conversion.");
         }
 
-        let mut trytes = T3B1::with_capacity(trits.len() / 3);
+        let mut trytes = T3B1::with_capacity(n / 3);
 
-        for i in (0..trits.0.len()).step_by(3) {
-            let a = trits.0[i + 0].value();
-            let b = trits.0[i + 1].value();
-            let c = trits.0[i + 2].value();
+        (0..n).step_by(3).for_each(|i| {
+            let a = *input.get(i + 0) as i8;
+            let b = *input.get(i + 1) as i8;
+            let c = *input.get(i + 2) as i8;
 
             let v = a + b * 3 + c * 9;
 
-            trytes.push_internal(Tryte(v));
-        }
+            trytes.push_internal(v.into());
+        });
 
         trytes
     }
 }
 
+impl IntoIterator for T3B1 {
+    type Item = BalancedTryte;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
 #[cfg(test)]
-mod should {
+mod tests {
     use super::*;
 
     #[test]
-    fn resize_with_push_and_pop() {
+    fn new_t3b1() {
+        let _ = T3B1::new();
+    }
+
+    #[test]
+    fn t3b1_from_i8() {
+        let input = vec![13, 9, -13, 9, -7, -9, 9];
+        let _ = T3B1::from_i8(&input);
+    }
+
+    #[test]
+    fn new_t3b1_from_str() {
+        let trytes: T3B1 = "MINI9TRI".into();
+
+        assert_eq!(8, trytes.len());
+    }
+
+    #[test]
+    fn push_and_pop() {
         let mut trytes = T3B1::new();
         assert_eq!(0, trytes.len());
 
@@ -115,9 +154,9 @@ mod should {
     }
 
     #[test]
-    fn initialize_from_str() {
-        let trytes: T3B1 = "I9LUV9BEE".into();
+    fn display_t3b1() {
+        let trytes: T3B1 = "MINI9TRI".into();
 
-        assert_eq!(9, trytes.len());
+        assert_eq!("MINI9TRI", trytes.to_string());
     }
 }

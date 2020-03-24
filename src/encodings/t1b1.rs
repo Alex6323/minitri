@@ -1,33 +1,37 @@
-use crate::luts;
-
 use super::t3b1::T3B1;
 use super::Encoding;
-
 //use super::t5b1::T5B1;
 //use super::t9b2::T9B2;
 
-use crate::trit::Trit;
-use crate::tryte::Tryte;
+use crate::trit::BalancedTrit;
 
-use std::ops::Deref;
+use std::fmt;
 
 #[derive(Debug)]
-pub struct T1B1(Vec<Trit>);
+pub struct T1B1(Vec<BalancedTrit>);
 
 impl T1B1 {
-    pub(crate) fn from_sbytes(sbytes: &[i8]) -> Self {
-        let mut trits = Vec::with_capacity(sbytes.len());
+    pub fn from_i8(input: &[i8]) -> Self {
+        let mut trits: Vec<BalancedTrit> = Vec::with_capacity(input.len());
 
-        for trit in sbytes {
-            trits.push(trit.into());
+        for trit in input {
+            trits.push((*trit).into());
         }
 
         Self(trits)
     }
 
+    pub fn get(&self, index: usize) -> &BalancedTrit {
+        &self.0[index]
+    }
+
+    pub fn get_mut(&mut self, index: usize) -> &mut BalancedTrit {
+        &mut self.0[index]
+    }
+
     pub fn push<T>(&mut self, trit: T)
     where
-        T: Into<Trit>,
+        T: Into<BalancedTrit>,
     {
         self.0.push(trit.into());
     }
@@ -36,15 +40,8 @@ impl T1B1 {
         self.0.pop();
     }
 
-    pub(crate) fn push_internal(&mut self, trit: Trit) {
+    pub(crate) fn push_internal(&mut self, trit: BalancedTrit) {
         self.0.push(trit);
-    }
-}
-
-impl Deref for T1B1 {
-    type Target = Vec<i8>;
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 
@@ -70,7 +67,7 @@ impl Encoding for T1B1 {
 
 impl<'a> From<&'a str> for T1B1 {
     fn from(s: &'a str) -> Self {
-        let mut trits: Vec<i8> = Vec::with_capacity(s.len());
+        let mut trits: Vec<BalancedTrit> = Vec::with_capacity(s.len());
 
         for c in s.chars() {
             trits.push(c.into());
@@ -80,8 +77,8 @@ impl<'a> From<&'a str> for T1B1 {
     }
 }
 
-impl std::fmt::Display for T1B1 {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl fmt::Display for T1B1 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for trit in &self.0 {
             trit.fmt(f)?;
         }
@@ -90,13 +87,13 @@ impl std::fmt::Display for T1B1 {
 }
 
 impl From<T3B1> for T1B1 {
-    fn from(trytes: T3B1) -> T1B1 {
-        let mut trits = T1B1::with_capacity(3 * trytes.len());
+    fn from(input: T3B1) -> T1B1 {
+        let mut trits = T1B1::with_capacity(3 * input.len());
 
-        for tryte in &trytes.0 {
-            let trits_in_tryte = luts::trits_from_tryteindex_internal(tryte.index());
-            for trit in &trits_in_tryte {
-                trits.push_internal(Trit(*trit));
+        for tryte in input {
+            let sub_trits = tryte.as_trits();
+            for trit in &sub_trits {
+                trits.push_internal((*trit).into());
             }
         }
 
@@ -147,8 +144,20 @@ impl From<T9B2> for T1B1 {
 */
 
 #[cfg(test)]
-mod should {
+mod tests {
     use super::*;
+    use crate::encodings::t3b1::T3B1;
+
+    #[test]
+    fn new_t1b1() {
+        let _ = T1B1::new();
+    }
+
+    #[test]
+    fn t1b1_from_i8() {
+        let input = vec![-1, -1, 1, 0, -1, 1];
+        let _ = T1B1::from_i8(&input);
+    }
 
     #[test]
     fn resize_with_push_and_pop() {
@@ -165,8 +174,23 @@ mod should {
 
     #[test]
     fn initialize_from_str() {
-        let trits: T1B1 = "10-01-110".try_into().expect("error parsing trit sequence");
+        let trits: T1B1 = "10-01-110".into();
 
         assert_eq!(9, trits.len());
+    }
+
+    #[test]
+    fn display_t1b1() {
+        let trits: T1B1 = "10-01-110".into();
+
+        assert_eq!("10-01-110", trits.to_string());
+    }
+
+    #[test]
+    fn from_t3b1() {
+        let trytes: T3B1 = "MINI9TRI".into();
+        let trits: T1B1 = trytes.into();
+
+        assert_eq!(24, trits.len());
     }
 }
