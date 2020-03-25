@@ -1,3 +1,11 @@
+//! Encoding, where 9 trits are stored using 2 bytes.
+//!
+//! Advantages:
+//!     * Multiples of 3 trytes map to even multiplis of bytes.
+//!     * More memory-efficient than T4B1 or T8B2.
+//! Disadvantages:
+//!     * Less memory-efficient than T5B1. (density: 4.5 trits per byte)
+
 use crate::luts;
 use crate::t1b1::T1B1;
 use crate::trits::Encoding;

@@ -1,3 +1,11 @@
+//! Encoding, where 3 trits are stored in a single byte.
+//!
+//! Advantages:
+//!     * Convenient mapping to the tryte alphabet ('9', 'A' ... 'Z')
+//!     * Better memory-efficiency than T1B1.
+//! Disadvantages:
+//!     * Still relatively memory-inefficient. (density: 3 trits per byte)
+
 use super::t1b1::T1B1;
 use super::Encoding;
 
@@ -19,12 +27,12 @@ impl T3B1 {
         Self(trytes)
     }
 
-    pub fn get(&self, index: usize) -> &BalancedTryte {
-        &self.0[index]
+    pub fn get(&self, index: usize) -> BalancedTryte {
+        self.0[index]
     }
 
-    pub fn get_mut(&mut self, index: usize) -> &mut BalancedTryte {
-        &mut self.0[index]
+    pub fn get_as_i8(&self, index: usize) -> i8 {
+        self.0[index] as i8
     }
 
     pub fn push<T>(&mut self, tryte: T)
@@ -90,15 +98,15 @@ impl From<T1B1> for T3B1 {
     fn from(input: T1B1) -> T3B1 {
         let n = input.len();
         if n % 3 != 0 {
-            panic!("Input must be a multiple of 3 for this conversion.");
+            unimplemented!("handle not-mulitple-of-3 case");
         }
 
         let mut trytes = T3B1::with_capacity(n / 3);
 
         (0..n).step_by(3).for_each(|i| {
-            let a = *input.get(i + 0) as i8;
-            let b = *input.get(i + 1) as i8;
-            let c = *input.get(i + 2) as i8;
+            let a = input.get(i + 0) as i8;
+            let b = input.get(i + 1) as i8;
+            let c = input.get(i + 2) as i8;
 
             let v = a + b * 3 + c * 9;
 
