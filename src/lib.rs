@@ -1,6 +1,4 @@
-//mod constants;
 mod encodings;
-//mod luts;
 //mod trinary;
 mod trit;
 mod tryte;
