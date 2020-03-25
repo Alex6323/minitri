@@ -1,17 +1,17 @@
 # Trit-Encodings
 
-An utterly simple trinary/ternary crate.
+An utterly simple ternary crate.
 
 # Intent
 
 This crate is for testing ternary stuff quickly. It is not intended for production use.
 
 # Properties
-    * no dependencies
-    * all important byte encodings required in IOTA
-    * minimalistic
-    * convenient to use
-    * simply panics on conversion errors
+    * no dependencies,
+    * all important ternary encodings used in the DLT IOTA,
+    * minimalistic,
+    * convenient to use,
+    * simply panics on conversion errors,
     * no unsafe code
 
 # Usage
