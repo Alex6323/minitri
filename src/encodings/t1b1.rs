@@ -15,7 +15,7 @@ use crate::trit::BalancedTrit;
 
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct T1B1(Vec<BalancedTrit>);
 
 impl T1B1 {

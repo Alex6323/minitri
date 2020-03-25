@@ -10,7 +10,7 @@ use crate::luts;
 use crate::t1b1::T1B1;
 use crate::trits::Encoding;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct T9B2(Vec<u8>);
 
 impl T9B2 {

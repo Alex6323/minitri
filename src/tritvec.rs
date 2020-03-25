@@ -1,19 +1,10 @@
 use crate::encodings::t1b1::T1B1;
 use crate::encodings::Encoding;
 
+#[derive(Clone, Debug)]
 pub struct TritVec<T: Encoding> {
     encoding: T,
 }
-
-/*
-impl TritVec {
-    pub fn default() -> Self {
-        Self {
-            encoding: T1B1::new(),
-        }
-    }
-}
-*/
 
 impl<T: Encoding> TritVec<T> {
     pub fn new() -> Self {

@@ -13,7 +13,7 @@ use crate::tryte::BalancedTryte;
 
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct T3B1(Vec<BalancedTryte>);
 
 impl T3B1 {

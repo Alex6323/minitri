@@ -1,6 +1,6 @@
 use crate::encodings::{t1b1::T1B1, t3b1::T3B1, Encoding};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct T5B1(Vec<u8>);
 
 impl T5B1 {
